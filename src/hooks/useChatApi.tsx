@@ -100,14 +100,20 @@ export const useChatApi = ({
         throw new Error(errorData.error?.message || `Request failed with status ${response.status}`);
       }
 
-      const data = await response.json();
-      
-      // Validate response structure
-      if (!data.answer) {
-        throw new Error('Invalid response: missing answer field');
+      // Parse the array response and extract the HTML answer
+      const arr = await response.json();
+      if (!Array.isArray(arr) || arr.length === 0) {
+        throw new Error('Invalid response: expected an array');
       }
+      const first = arr[0];
+      if (typeof first.html !== 'string') {
+        throw new Error('Invalid response: missing html field');
+      }
+      return {
+        answer: first.html,
+        sources: first.suggestedQuestions?.map(q => ({ title: q, url: '' })) || [],
+      };
 
-      return data as ChatApiResponse;
     } catch (error: any) {
       if (error.name === 'AbortError') {
         throw new Error('Request was cancelled');
