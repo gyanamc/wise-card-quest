@@ -36,7 +36,7 @@ interface ChatInterfaceProps {
 
 const defaultSettings: SettingsData = {
   systemPrompt: `You are a helpful, agentic AI financial advisor specializing in credit cards. Your goal is to ask clarifying questions to understand the user's spending habits, credit score, and goals (rewards, travel, cashback, building credit) and then provide a personalized, ranked list of recommendations. Always use Markdown for formatting (tables for comparisons, lists for features). Never ask for PII like phone numbers.`,
-  webhookUrl: 'https://primary-production-da3f.up.railway.app/webhook/gyanam.store',
+  webhookUrl: 'https://primary-production-da3f.up.railway.app/webhook-test/gyanam.store',
   authToken: '',
   maxHistory: 10,
   requestTimeout: 30000,
