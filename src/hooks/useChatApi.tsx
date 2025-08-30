@@ -22,7 +22,6 @@ interface ChatApiError {
     code: string;
   };
 }
-
 interface UseChatApiProps {
   webhookUrl: string;
   authToken?: string;
@@ -40,6 +39,7 @@ body: JSON.stringify({
   messages,
   conversation_history: recentHistory
 }),
+
 
   const [isLoading, setIsLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
