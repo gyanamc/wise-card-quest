@@ -22,6 +22,7 @@ interface ChatApiError {
     code: string;
   };
 }
+
 interface UseChatApiProps {
   webhookUrl: string;
   authToken?: string;
@@ -31,16 +32,14 @@ interface UseChatApiProps {
   userId?: string;
 }
 
-body: JSON.stringify({
-  query: message,
-  sessionId: sessionId,
-  userId: userId,
-  session_id: sessionId, // Keep for backward compatibility
-  messages,
-  conversation_history: recentHistory
-}),
-
-
+export const useChatApi = ({
+  webhookUrl,
+  authToken,
+  systemPrompt,
+  maxHistory,
+  requestTimeout,
+  userId
+}: UseChatApiProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
 
@@ -83,13 +82,12 @@ body: JSON.stringify({
         body: JSON.stringify({
           query: message,
           sessionId: sessionId,
+          userId: userId,
           session_id: sessionId, // Keep for backward compatibility
           messages,
           conversation_history: recentHistory
         }),
-
         signal: controller.signal,
-        // Add timeout using AbortSignal.timeout if available, otherwise manual timeout
       });
 
       if (!response.ok) {
@@ -103,14 +101,13 @@ body: JSON.stringify({
       }
 
       const data = await response.json();
-
+      
       // Validate response structure
       if (!data.answer) {
         throw new Error('Invalid response: missing answer field');
       }
 
       return data as ChatApiResponse;
-
     } catch (error: any) {
       if (error.name === 'AbortError') {
         throw new Error('Request was cancelled');
@@ -120,14 +117,14 @@ body: JSON.stringify({
       if (error.name === 'TimeoutError') {
         throw new Error('Request timed out');
       }
-
+      
       // Re-throw with original message
       throw error;
     } finally {
       setIsLoading(false);
       setAbortController(null);
     }
-  }, [webhookUrl, authToken, systemPrompt, maxHistory, requestTimeout]);
+  }, [webhookUrl, authToken, systemPrompt, maxHistory, requestTimeout, userId]);
 
   const stopGeneration = useCallback(() => {
     if (abortController) {
