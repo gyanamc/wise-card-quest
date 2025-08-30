@@ -224,12 +224,18 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
       // Send to AI
       const response = await sendMessage(content, sessionId, messages);
 
-      // Save AI response
-      const aiMessage = await saveMessage(response.answer, 'assistant');
-      if (!aiMessage) throw new Error('Failed to save AI message');
 
-      // Update local state
-      setMessages(prev => [...prev, { ...aiMessage, type: aiMessage.type as 'user' | 'assistant' }]);
+      // Append AI response locally (do not save to Supabase)
+      setMessages(prev => [
+        ...prev,
+        {
+          id: uuidv4(),
+          content: response.answer,
+          type: 'assistant',
+          created_at: new Date().toISOString(),
+          session_id: sessionId
+        }
+      ]);
 
       // Update session timestamp
       await supabase
