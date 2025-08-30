@@ -50,8 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signInWithGoogle = async () => {
-    const redirectUrl = `${window.location.origin}/`;
-    
+    const redirectUrl = 'https://gyanam.store/';
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
