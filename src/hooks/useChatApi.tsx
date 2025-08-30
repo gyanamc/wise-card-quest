@@ -1,0 +1,139 @@
+import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+interface ChatMessage {
+  id: string;
+  content: string;
+  type: 'user' | 'assistant';
+  created_at: string;
+}
+
+interface ChatApiResponse {
+  answer: string;
+  sources?: Array<{
+    title: string;
+    url: string;
+  }>;
+}
+
+interface ChatApiError {
+  error: {
+    message: string;
+    code: string;
+  };
+}
+
+interface UseChatApiProps {
+  webhookUrl: string;
+  authToken?: string;
+  systemPrompt: string;
+  maxHistory: number;
+  requestTimeout: number;
+}
+
+export const useChatApi = ({
+  webhookUrl,
+  authToken,
+  systemPrompt,
+  maxHistory,
+  requestTimeout
+}: UseChatApiProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
+
+  const sendMessage = useCallback(async (
+    message: string,
+    sessionId: string,
+    conversationHistory: ChatMessage[]
+  ): Promise<ChatApiResponse> => {
+    setIsLoading(true);
+    
+    // Create abort controller for this request
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    try {
+      // Prepare conversation history (limit to maxHistory)
+      const recentHistory = conversationHistory.slice(-maxHistory);
+      
+      // Build messages array with system prompt
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...recentHistory.map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        })),
+        { role: 'user', content: message }
+      ];
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          session_id: sessionId,
+          messages,
+          conversation_history: recentHistory
+        }),
+        signal: controller.signal,
+        // Add timeout using AbortSignal.timeout if available, otherwise manual timeout
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ 
+          error: { 
+            message: `HTTP ${response.status}: ${response.statusText}`, 
+            code: response.status.toString() 
+          } 
+        }));
+        throw new Error(errorData.error?.message || `Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Validate response structure
+      if (!data.answer) {
+        throw new Error('Invalid response: missing answer field');
+      }
+
+      return data as ChatApiResponse;
+
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request was cancelled');
+      }
+      
+      // Handle timeout
+      if (error.name === 'TimeoutError') {
+        throw new Error('Request timed out');
+      }
+
+      // Re-throw with original message
+      throw error;
+    } finally {
+      setIsLoading(false);
+      setAbortController(null);
+    }
+  }, [webhookUrl, authToken, systemPrompt, maxHistory, requestTimeout]);
+
+  const stopGeneration = useCallback(() => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+      setIsLoading(false);
+    }
+  }, [abortController]);
+
+  return {
+    sendMessage,
+    stopGeneration,
+    isLoading
+  };
+};
