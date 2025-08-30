@@ -171,23 +171,3 @@ All colors MUST be HSL.
 .markdown-content blockquote {
   @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
 }
-
-/* === Chat container layout for pinned input and scrollable messages === */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--background);
-}
-
-.chat-messages {
-  flex: 1 1 0%;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scroll-behavior: smooth;
-  overflow-anchor: none;
-  min-height: 0;
-  padding-bottom: 8px; /* Space for input */
-}
