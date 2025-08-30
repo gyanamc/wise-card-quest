@@ -1,3 +1,4 @@
+const didMountRef = useRef(false);
 import { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Download, Trash2, Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -373,8 +374,12 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
     setEditingTitle('');
   };
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom on message updates, skip on initial load
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
