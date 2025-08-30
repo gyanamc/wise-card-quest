@@ -29,15 +29,18 @@ interface UseChatApiProps {
   systemPrompt: string;
   maxHistory: number;
   requestTimeout: number;
+  userId?: string;
 }
 
-export const useChatApi = ({
-  webhookUrl,
-  authToken,
-  systemPrompt,
-  maxHistory,
-  requestTimeout
-}: UseChatApiProps) => {
+body: JSON.stringify({
+  query: message,
+  sessionId: sessionId,
+  userId: userId,
+  session_id: sessionId, // Keep for backward compatibility
+  messages,
+  conversation_history: recentHistory
+}),
+
   const [isLoading, setIsLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
 
