@@ -78,10 +78,13 @@ export const useChatApi = ({
         method: 'POST',
         headers,
         body: JSON.stringify({
-          session_id: sessionId,
+          query: message,
+          sessionId: sessionId,
+          session_id: sessionId, // Keep for backward compatibility
           messages,
           conversation_history: recentHistory
         }),
+
         signal: controller.signal,
         // Add timeout using AbortSignal.timeout if available, otherwise manual timeout
       });
