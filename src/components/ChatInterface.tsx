@@ -54,13 +54,14 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
   const [bookmarkedMessages, setBookmarkedMessages] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  
   const { sendMessage, stopGeneration, isLoading } = useChatApi({
     webhookUrl: settings.webhookUrl,
     authToken: settings.authToken,
     systemPrompt: settings.systemPrompt,
     maxHistory: settings.maxHistory,
-    requestTimeout: settings.requestTimeout
+    requestTimeout: settings.requestTimeout,
+    userId: user?.id
   });
 
   // Load settings from localStorage
