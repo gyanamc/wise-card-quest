@@ -50,8 +50,10 @@ export const ChatMessage = ({ message, isBookmarked, onToggleBookmark }: ChatMes
         {isUser ? (
           <p className="whitespace-pre-wrap">{message.content}</p>
         ) : (
-          <MarkdownRenderer content={message.content} />
-        )}
+        <div className="prose prose-slate prose-sm max-w-none">
+        <MarkdownRenderer content={message.content} />
+        </div>
+      )}
 
         {/* Action buttons */}
         <div className={cn(
