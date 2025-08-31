@@ -102,10 +102,14 @@ export const useChatApi = ({
 
       // Parse the array response and extract the HTML answer
       const arr = await response.json();
+      console.log('Full response array:', arr);
       if (!Array.isArray(arr) || arr.length === 0) {
         throw new Error('Invalid response: expected an array');
       }
       const first = arr[0];
+      console.log('First item:', first);
+      console.log('HTML content length:', first.html?.length);
+      console.log('HTML content:', first.html);
       if (typeof first.html !== 'string') {
         throw new Error('Invalid response: missing html field');
       }
