@@ -186,3 +186,32 @@ All colors MUST be HSL.
   overscroll-behavior: contain;
   scroll-behavior: smooth;
 }
+
+/* Container fills viewport; input stays at bottom */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;            /* Prevent outer scrolling */
+}
+
+/* Header & footer have natural height */
+.header,
+.chat-input-container {
+  flex-shrink: 0;
+}
+
+/* Messages occupy remaining space with its own scroll */
+.chat-messages {
+  flex: 1 1 0;
+  min-height: 0;               /* Allow proper flexbox calculation */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Inner wrapper to apply padding/margins */
+.messages-inner {
+  padding: 1rem;               /* Or whatever your spacing is */
+}
+
