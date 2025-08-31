@@ -33,9 +33,12 @@ export const SettingsModal = ({ open, onOpenChange, settings, onSaveSettings }: 
   useEffect(() => {
     setFormData(settings);
   }, [settings]);
-
+  
   const handleSave = () => {
-    onSaveSettings(formData);
+    onSaveSettings({
+      ...formData,
+      webhookUrl: formData.webhookUrl.trim(),
+    });
     onOpenChange(false);
   };
 
