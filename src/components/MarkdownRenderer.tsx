@@ -88,9 +88,18 @@ export const MarkdownRenderer = ({ content, className = "" }: MarkdownRendererPr
   }, [sanitizedContent, copiedCode]);
 
   return (
-    <div 
-      className={`markdown-content prose prose-slate max-w-none ${className}`}
+    <div
+      className={`
+      markdown-content
+      prose
+      prose-slate
+      prose-table:border
+      prose-table:border-gray-200
+      prose-code:bg-muted
+      max-w-none
+      ${className}
+      `}
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-    />
+      />
   );
 };
