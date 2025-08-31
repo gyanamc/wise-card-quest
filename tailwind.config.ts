@@ -92,5 +92,26 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+
+	
+	plugins: [
+		require("tailwindcss-animate"),
+		require("@tailwindcss/typography"),
+	],
+// Optional: add a custom typography preset for chat
+	
+	
+	typography: (theme) => ({
+		chat: {
+			css: {
+				"--tw-prose-body": theme("colors.foreground"),
+				"--tw-prose-headings": theme("colors.foreground"),
+				"--tw-prose-links": theme("colors.primary"),
+				"code": { backgroundColor: theme("colors.muted") },
+				"table": { width: "100%" },
+				"th": { fontWeight: "bold" },
+				"td": { padding: "0.5rem 1rem" },
+			},
+		},
+	}),
 } satisfies Config;
