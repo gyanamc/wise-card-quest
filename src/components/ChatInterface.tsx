@@ -55,6 +55,7 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
   const [bookmarkedMessages, setBookmarkedMessages] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const didMountRef = useRef(false);
   
   const { sendMessage, stopGeneration, isLoading } = useChatApi({
     webhookUrl: settings.webhookUrl,
