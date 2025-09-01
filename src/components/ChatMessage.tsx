@@ -10,6 +10,7 @@ interface ChatMessageProps {
     content: string;
     type: 'user' | 'assistant';
     created_at: string;
+    suggestedQuestions?: string[];
   };
   isBookmarked?: boolean;
   onToggleBookmark?: (messageId: string) => void;
