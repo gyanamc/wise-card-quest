@@ -41,9 +41,10 @@ export const MarkdownRenderer = ({ content, className = "" }: MarkdownRendererPr
       console.error('Failed to copy text: ', err);
     }
   };
-
-  // Parse markdown to HTML
-  const htmlContent = marked.parse(content);
+  
+   // Parse markdown to HTML (guard against null/undefined)
+  const safeContent = content ?? '';
+  const htmlContent = marked.parse(safeContent);
   
   // Sanitize HTML to prevent XSS
   const sanitizedContent = DOMPurify.sanitize(htmlContent as string);
