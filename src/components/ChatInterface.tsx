@@ -224,17 +224,20 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
       // Send to AI
       const response = await sendMessage(content, sessionId, messages);
+      
+            // response.sources is an array of { title, url }
+            // Append AI response locally (do not save to Supabase)
 
-
-      // Append AI response locally (do not save to Supabase)
+      
       setMessages(prev => [
-        ...prev,
+        prev,
         {
           id: uuidv4(),
           content: response.answer,
           type: 'assistant',
           created_at: new Date().toISOString(),
-          session_id: sessionId
+          session_id: sessionId,
+          suggestedQuestions: response.sources?.map(s => s.title) || []
         }
       ]);
 
