@@ -54,6 +54,26 @@ export const ChatMessage = ({ message, isBookmarked, onToggleBookmark }: ChatMes
         <MarkdownRenderer content={message.content} />
         </div>
       )}
+        {/* Suggested Questions - only for assistant messages */}
+        {!isUser && message.suggestedQuestions?.length > 0 && (
+      <div className="mt-4 space-y-2">
+        <h4 className="font-semibold text-sm">Suggested follow-ups:</h4>
+        <div className="flex flex-wrap gap-2">
+          {message.suggestedQuestions.map((q, i) => (
+        <button
+          key={i}
+          className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm hover:bg-secondary/90 transition-colors"
+          onClick={() => {
+                   // You can add a callback prop to handle sending the question
+            console.log('Suggested question clicked:', q);
+          }}
+          >
+          {q}
+        </button>
+      ))}
+        </div>
+      </div>
+    )}
 
         {/* Action buttons */}
         <div className={cn(
