@@ -1,3 +1,11 @@
+/* Google Fonts import must be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Chat interface styles below */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -121,8 +129,7 @@ All colors MUST be HSL.
   }
 }
 
-/* Add Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
 
 /* Chat interface styles */
 .chat-gradient {
