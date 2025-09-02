@@ -215,3 +215,69 @@ All colors MUST be HSL.
   padding: 1rem;               /* Or whatever your spacing is */
 }
 
+/* Main app layout - 3 sections */
+.app-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Left sidebar - split into scrollable history and fixed bottom */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+.sidebar-header {
+  flex-shrink: 0;
+  padding: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.sidebar-history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.sidebar-footer {
+  flex-shrink: 0;
+  border-top: 1px solid hsl(var(--border));
+  padding: 1rem;
+  background: hsl(var(--muted/50));
+}
+
+/* Chat area - scrollable messages with fixed input */
+.chat-area {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chat-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  padding: 1rem 2rem;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem;
+  scroll-behavior: smooth;
+}
+
+.chat-input-fixed {
+  flex-shrink: 0;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  padding: 1rem 2rem;
+}
+
+
