@@ -41,13 +41,13 @@ export const MarkdownRenderer = ({ content, className = "" }: MarkdownRendererPr
       console.error('Failed to copy text: ', err);
     }
   };
-  
-   // Parse markdown to HTML (guard against null/undefined)
   const safeContent = content ?? '';
-  const htmlContent = marked.parse(safeContent);
-  
-  // Sanitize HTML to prevent XSS
-  const sanitizedContent = DOMPurify.sanitize(htmlContent as string);
+  // Parse markdown (with GFM tables) and sanitize
+  const rawHtml = marked.parse(safeContent);
+  const sanitizedContent = DOMPurify.sanitize(rawHtml, {
+    ADD_TAGS: ['table','thead','tbody','tr','th','td'],
+    ADD_ATTR: ['class']
+  });
 
   useEffect(() => {
     // Add copy buttons to code blocks after render
