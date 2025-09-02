@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { RefreshCw, Download, Trash2, Edit2, Check, X } from 'lucide-react';
+import { RefreshCw, Download, Trash2, Edit2, Check, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { SettingsModal } from './SettingsModal';
@@ -55,7 +54,7 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const didMountRef = useRef(false);
-  
+
   const { sendMessage, stopGeneration, isLoading } = useChatApi({
     webhookUrl: settings.webhookUrl,
     authToken: settings.authToken,
@@ -96,7 +95,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const loadMessages = async () => {
     if (!user || !sessionId) return;
-
     try {
       setLoading(true);
       
@@ -144,7 +142,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const loadBookmarks = async () => {
     if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('bookmarks')
@@ -162,7 +159,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const saveMessage = async (content: string, type: 'user' | 'assistant') => {
     if (!user) return null;
-
     try {
       const { data, error } = await supabase
         .from('chat_messages')
@@ -185,7 +181,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const updateSessionTitle = async (newTitle: string) => {
     if (!user) return;
-
     try {
       const { error } = await supabase
         .from('chat_sessions')
@@ -207,7 +202,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const handleSendMessage = async (content: string) => {
     if (!user) return;
-
     try {
       // Save user message
       const userMessage = await saveMessage(content, 'user');
@@ -225,19 +219,15 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
       // Send to AI
       const response = await sendMessage(content, sessionId, messages);
       
-            // response.sources is an array of { title, url }
-            // Append AI response locally (do not save to Supabase)
-
-      
+      // Append AI response locally (do not save to Supabase)
       setMessages(prev => [
-        prev,
+        ...prev,
         {
           id: uuidv4(),
           content: response.answer,
           type: 'assistant',
           created_at: new Date().toISOString(),
-          session_id: sessionId,
-          suggestedQuestions: response.sources?.map(s => s.title) || []
+          session_id: sessionId
         }
       ]);
 
@@ -247,7 +237,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
         .update({ updated_at: new Date().toISOString() })
         .eq('id', sessionId)
         .eq('user_id', user.id);
-
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
@@ -260,10 +249,8 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const handleToggleBookmark = async (messageId: string) => {
     if (!user) return;
-
     try {
       const isBookmarked = bookmarkedMessages.has(messageId);
-
       if (isBookmarked) {
         // Remove bookmark
         const { error } = await supabase
@@ -296,7 +283,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
         if (error) throw error;
 
         setBookmarkedMessages(prev => new Set([...prev, messageId]));
-
         toast({
           title: "Bookmark added",
           description: "Message has been added to bookmarks.",
@@ -314,7 +300,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
 
   const handleClearChat = async () => {
     if (!user || !confirm('Are you sure you want to clear this chat? This action cannot be undone.')) return;
-
     try {
       const { error } = await supabase
         .from('chat_messages')
@@ -403,11 +388,65 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
   }
 
   return (
-    <>
-      <div className="chat-container">
-        {/* Header */}
-        <div className="border-b border-border bg-background p-4">
-          <div className="flex items-center justify-between max-w-4xl mx-auto">
+    <div className="app-layout">
+      {/* Left Sidebar */}
+      <div className="sidebar">
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
+          <h1 className="font-bold text-lg">AI Credit Advisor</h1>
+          <Button 
+            className="w-full mt-4" 
+            onClick={() => window.location.href = '/chat'}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Chat
+          </Button>
+          
+          <div className="mt-4">
+            <Input
+              placeholder="Search conversations..."
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        {/* Scrollable Chat History */}
+        <div className="sidebar-history">
+          <div className="px-4 space-y-1">
+            <div className="p-3 rounded-lg bg-muted">
+              <div className="font-medium truncate">Current Chat</div>
+              <div className="text-sm text-muted-foreground">
+                {new Date().toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Section */}
+        <div className="sidebar-footer">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-medium">
+              {user?.email?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <span className="font-medium text-sm truncate">{user?.email}</span>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Chat Area */}
+      <div className="chat-area">
+        {/* Chat Header */}
+        <div className="chat-header">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-1">
               {isEditingTitle ? (
                 <div className="flex items-center gap-2 flex-1">
@@ -429,24 +468,23 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
                 </div>
               ) : (
                 <div className="flex items-center gap-2 flex-1">
-                  <h1 className="text-lg font-semibold truncate">{sessionTitle}</h1>
+                  <h2 className="text-lg font-semibold truncate">{sessionTitle}</h2>
                   <Button size="sm" variant="ghost" onClick={handleEditTitle}>
                     <Edit2 className="h-4 w-4" />
                   </Button>
                 </div>
               )}
             </div>
-
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Regenerate
               </Button>
-              <Button size="sm" variant="outline" onClick={handleExportChat}>
+              <Button variant="outline" size="sm" onClick={handleExportChat}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button size="sm" variant="outline" onClick={handleClearChat}>
+              <Button variant="outline" size="sm" onClick={handleClearChat}>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear
               </Button>
@@ -454,9 +492,9 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
           </div>
         </div>
 
-        {/* Messages */}
-        <ScrollArea className="chat-messages">
-          <div className="max-w-4xl mx-auto p-4 space-y-4">
+        {/* Scrollable Messages */}
+        <div className="chat-messages">
+          <div className="max-w-4xl mx-auto space-y-6">
             {messages.length === 0 ? (
               <div className="text-center py-12">
                 <h2 className="text-2xl font-semibold mb-4">Welcome to AI Credit Card Advisor</h2>
@@ -530,16 +568,18 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
             
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
 
-        {/* Input */}
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          onOpenSettings={() => setSettingsOpen(true)}
-          disabled={isLoading}
-          isGenerating={isLoading}
-          onStopGeneration={stopGeneration}
-        />
+        {/* Fixed Input */}
+        <div className="chat-input-fixed">
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            onOpenSettings={() => setSettingsOpen(true)}
+            disabled={isLoading}
+            isGenerating={isLoading}
+            onStopGeneration={stopGeneration}
+          />
+        </div>
       </div>
 
       <SettingsModal
@@ -548,6 +588,6 @@ export const ChatInterface = ({ sessionId, onUpdateSessionTitle }: ChatInterface
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
-    </>
+    </div>
   );
 };
