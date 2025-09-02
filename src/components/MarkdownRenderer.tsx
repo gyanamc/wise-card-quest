@@ -44,7 +44,7 @@ export const MarkdownRenderer = ({ content, className = "" }: MarkdownRendererPr
   
    // Parse markdown to HTML (guard against null/undefined)
   const safeContent = content ?? '';
-  const htmlContent = marked.parse(safeContent)
+  const htmlContent = marked.parse(safeContent);
   
   // Sanitize HTML to prevent XSS
   const sanitizedContent = DOMPurify.sanitize(htmlContent as string);
